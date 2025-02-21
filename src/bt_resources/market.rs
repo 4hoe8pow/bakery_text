@@ -3,7 +3,7 @@ use std::{fmt, str::FromStr};
 use bevy::prelude::*;
 use rand::seq::IndexedRandom;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Ingredient {
     Flour,
     Salt,
@@ -24,6 +24,19 @@ impl FromStr for Ingredient {
             "yeast" => Ok(Ingredient::Yeast),
             _ => Err(()),
         }
+    }
+}
+
+impl fmt::Display for Ingredient {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let ingredient_str = match self {
+            Ingredient::Flour => "Flour",
+            Ingredient::Salt => "Salt",
+            Ingredient::Sugar => "Sugar",
+            Ingredient::Butter => "Butter",
+            Ingredient::Yeast => "Yeast",
+        };
+        write!(f, "{}", ingredient_str)
     }
 }
 

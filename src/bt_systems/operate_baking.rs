@@ -17,6 +17,22 @@ pub enum BakingCommand {
 
 impl_from_str!(BakingCommand, Bake => "bake");
 
+pub fn operate_baking(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Baking>>,
+    mut events: EventReader<Emitation>,
+) {
+    if let Ok((mut terminal, mode)) = query.get_single_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_bk(command, &mut terminal);
+                handle_baking_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 fn handle_baking_command(input: &str, terminal: &mut BakeryTerminal) {
     if let Ok(cmd) = input.parse::<BakingCommand>() {
         match cmd {
@@ -35,22 +51,6 @@ fn handle_general_in_bk(input: &str, terminal: &mut BakeryTerminal) {
             GeneralCommand::Shoo => exec_shoo_bk(terminal),
         }
         let _ = terminal.submit_input();
-    }
-}
-
-pub fn operate_baking(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Baking>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_bk(command, &mut terminal);
-                handle_baking_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
     }
 }
 

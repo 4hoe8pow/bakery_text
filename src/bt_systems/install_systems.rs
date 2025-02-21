@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{fmt, time::Duration};
 
 use bevy::{color::palettes::css::*, prelude::*};
 
@@ -60,7 +60,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     0,
-                    None,
+                    Repository::new_empty(),
                     OperatorMode::Commander,
                     Purchasing,
                     font_teko.clone(),
@@ -70,7 +70,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     1,
-                    Some(Repository::new_raw_only()),
+                    Repository::new_raw_only(),
                     OperatorMode::default(),
                     Pantry,
                     font_teko.clone(),
@@ -80,7 +80,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     2,
-                    Some(Repository::new_raw_with_dough()),
+                    Repository::new_raw_with_dough(),
                     OperatorMode::default(),
                     Mixing,
                     font_teko.clone(),
@@ -90,7 +90,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     3,
-                    Some(Repository::new_all()),
+                    Repository::new_all(),
                     OperatorMode::default(),
                     Cooling,
                     font_teko.clone(),
@@ -100,7 +100,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     4,
-                    Some(Repository::new_dough_with_bread()),
+                    Repository::new_dough_with_bread(),
                     OperatorMode::default(),
                     Shaping,
                     font_teko.clone(),
@@ -110,7 +110,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     5,
-                    Some(Repository::new_bread_only()),
+                    Repository::new_bread_only(),
                     OperatorMode::default(),
                     Baking,
                     font_teko.clone(),
@@ -120,7 +120,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     6,
-                    Some(Repository::new_bread_only()),
+                    Repository::new_bread_only(),
                     OperatorMode::default(),
                     Packaging,
                     font_teko.clone(),
@@ -130,7 +130,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     7,
-                    Some(Repository::new_bread_only()),
+                    Repository::new_bread_only(),
                     OperatorMode::default(),
                     QualityControl,
                     font_teko.clone(),
@@ -140,7 +140,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     8,
-                    Some(Repository::new_bread_only()),
+                    Repository::new_bread_only(),
                     OperatorMode::default(),
                     Stockroom,
                     font_teko.clone(),
@@ -150,7 +150,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     9,
-                    Some(Repository::new_bread_only()),
+                    Repository::new_bread_only(),
                     OperatorMode::default(),
                     SalesFront,
                     font_teko.clone(),
@@ -160,7 +160,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     10,
-                    None,
+                    Repository::new_empty(),
                     OperatorMode::default(),
                     WasteStation,
                     font_teko.clone(),
@@ -170,7 +170,7 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
                 add_section(
                     builder,
                     11,
-                    None,
+                    Repository::new_empty(),
                     OperatorMode::default(),
                     Utility,
                     font_teko.clone(),
@@ -221,13 +221,13 @@ pub fn spawn_layout(mut cmd: Commands, asset_server: Res<AssetServer>) {
 fn add_section(
     builder: &mut ChildBuilder,
     section_id: u8,
-    repository: Option<Repository>,
+    repository: Repository,
     operator_mode: OperatorMode,
-    section: impl Component + Section,
+    section: impl Component + Section + fmt::Display,
     font_teko: Handle<Font>,
     icon: Handle<Image>,
 ) {
-    let help_text = "Type 'help'".to_string();
+    let help_text = format!("Type 'help' for {}", section);
 
     builder
         .spawn((
@@ -273,9 +273,7 @@ fn add_section(
                 },
                 operator_mode,
                 section,
+                repository,
             ));
-            if let Some(repo) = repository {
-                builder.spawn(repo);
-            }
         });
 }

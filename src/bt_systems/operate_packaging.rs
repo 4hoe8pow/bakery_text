@@ -18,6 +18,22 @@ pub enum PackagingCommand {
 
 impl_from_str!(PackagingCommand, Pack => "pack", Label => "label");
 
+pub fn operate_packaging(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Packaging>>,
+    mut events: EventReader<Emitation>,
+) {
+    if let Ok((mut terminal, mode)) = query.get_single_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_pg(command, &mut terminal);
+                handle_packaging_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 fn handle_packaging_command(input: &str, terminal: &mut BakeryTerminal) {
     if let Ok(cmd) = input.parse::<PackagingCommand>() {
         match cmd {
@@ -37,22 +53,6 @@ fn handle_general_in_pg(input: &str, terminal: &mut BakeryTerminal) {
             GeneralCommand::Shoo => exec_shoo_pg(terminal),
         }
         let _ = terminal.submit_input();
-    }
-}
-
-pub fn operate_packaging(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Packaging>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_pg(command, &mut terminal);
-                handle_packaging_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
     }
 }
 

@@ -18,6 +18,7 @@ use crate::{
         operate_cooling::*,
         operate_mixing::*,
         operate_packaging::*,
+        operate_pantry::*,
         operate_purchasing::*,
         operate_quality_control::*,
         operate_shaping::*,
@@ -34,6 +35,7 @@ pub enum PausedState {
     #[default]
     Running,
     Paused,
+    Freeze,
 }
 
 fn main() {
@@ -55,13 +57,16 @@ fn main() {
         .insert_resource(WorldTimer(Timer::from_seconds(3.0, TimerMode::Repeating)))
         .add_systems(Startup, (setup_camera, spawn_layout))
         .add_systems(
+            PreUpdate,
+            (handle_text_input, handle_esc_key, switch_section)
+                .run_if(in_state(PausedState::Running)),
+        )
+        .add_systems(
             Update,
             (
                 update_market_prices,
-                handle_text_input,
-                handle_esc_key,
-                switch_section,
                 operate_purchasing,
+                operate_pantry,
                 operate_baking,
                 operate_mixing,
                 operate_cooling,
@@ -75,7 +80,10 @@ fn main() {
             )
                 .run_if(not(in_state(PausedState::Paused))),
         )
-        .add_systems(PostUpdate, presenter)
+        .add_systems(
+            PostUpdate,
+            presenter.run_if(not(in_state(PausedState::Paused))),
+        )
         .add_systems(Update, ask_exit.run_if(in_state(PausedState::Paused)))
         .run();
 }

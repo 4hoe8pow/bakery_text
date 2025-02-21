@@ -16,6 +16,22 @@ pub enum ShapingCommand {
     Roll,
 }
 
+pub fn operate_shaping(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Shaping>>,
+    mut events: EventReader<Emitation>,
+) {
+    if let Ok((mut terminal, mode)) = query.get_single_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_sh(command, &mut terminal);
+                handle_shaping_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 impl_from_str!(ShapingCommand, Div => "div", Roll => "roll");
 
 fn handle_shaping_command(input: &str, terminal: &mut BakeryTerminal) {
@@ -37,22 +53,6 @@ fn handle_general_in_sh(input: &str, terminal: &mut BakeryTerminal) {
             GeneralCommand::Shoo => exec_shoo_sh(terminal),
         }
         let _ = terminal.submit_input();
-    }
-}
-
-pub fn operate_shaping(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Shaping>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_sh(command, &mut terminal);
-                handle_shaping_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
     }
 }
 

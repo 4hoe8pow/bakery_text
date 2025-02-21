@@ -6,16 +6,16 @@ use crate::{
 };
 
 pub fn transport(
-    mut query: Query<(&mut BakeryTerminal, Option<&mut Repository>)>,
+    mut query: Query<(&mut BakeryTerminal, &mut Repository)>,
     mut events: EventReader<Transportation>,
 ) {
     events.read().for_each(|ev| {
-        query.iter_mut().for_each(|(terminal, repo)| {
+        eprintln!("Transportation event: {:?}", ev.pack);
+        query.iter_mut().for_each(|(terminal, mut repo)| {
             if ev.to_term_id == terminal.id {
-                if let Some(mut repo) = repo {
-                    // RepositoryがNoneでない場合の処理
-                    *repo += ev.pack.clone();
-                }
+                *repo += ev.pack.clone();
+            } else if ev.from_term_id == terminal.id {
+                *repo -= ev.pack.clone();
             }
         });
     });

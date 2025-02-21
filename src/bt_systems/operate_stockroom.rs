@@ -18,6 +18,22 @@ pub enum StockroomCommand {
 
 impl_from_str!(StockroomCommand, Store => "store", Inventory => "inventory");
 
+pub fn operate_stockroom(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Stockroom>>,
+    mut events: EventReader<Emitation>,
+) {
+    if let Ok((mut terminal, mode)) = query.get_single_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_st(command, &mut terminal);
+                handle_stockroom_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 fn handle_stockroom_command(input: &str, terminal: &mut BakeryTerminal) {
     if let Ok(cmd) = input.parse::<StockroomCommand>() {
         match cmd {
@@ -37,22 +53,6 @@ fn handle_general_in_st(input: &str, terminal: &mut BakeryTerminal) {
             GeneralCommand::Shoo => exec_shoo_st(terminal),
         }
         let _ = terminal.submit_input();
-    }
-}
-
-pub fn operate_stockroom(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Stockroom>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_st(command, &mut terminal);
-                handle_stockroom_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
     }
 }
 

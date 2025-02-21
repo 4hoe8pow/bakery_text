@@ -38,11 +38,11 @@ pub fn operate_purchasing(
     mut wallet: ResMut<Wallet>,
     mut transportation_events: EventWriter<Transportation>,
 ) {
-    for (mut terminal, mode, mut gauge) in query.iter_mut() {
+    if let Ok((mut terminal, mode, mut gauge)) = query.get_single_mut() {
         if let OperatorMode::Commander = mode {
             for ev in events.read() {
                 let (command, opt1, opt2) = ev.split_command();
-                handle_general_pc(command, &mut terminal, &format!("{}", *market));
+                handle_general_ps(command, &mut terminal, &format!("{}", *market));
                 handle_purchasing_command(
                     command,
                     &mut terminal,
@@ -58,13 +58,13 @@ pub fn operate_purchasing(
     }
 }
 
-fn handle_general_pc(input: &str, terminal: &mut BakeryTerminal, market_status: &str) {
+fn handle_general_ps(input: &str, terminal: &mut BakeryTerminal, market_status: &str) {
     if let Ok(cmd) = input.parse::<GeneralCommand>() {
         match cmd {
-            GeneralCommand::Help => exec_help_pc(terminal),
-            GeneralCommand::Ls => exec_ls_pc(terminal, market_status),
-            GeneralCommand::Mv => exec_mv_pc(terminal),
-            GeneralCommand::Shoo => exec_shoo_pc(terminal),
+            GeneralCommand::Help => exec_help_ps(terminal),
+            GeneralCommand::Ls => exec_ls_ps(terminal, market_status),
+            GeneralCommand::Mv => exec_mv_ps(terminal),
+            GeneralCommand::Shoo => exec_shoo_ps(terminal),
         }
         let _ = terminal.submit_input();
     }
@@ -83,14 +83,14 @@ fn handle_purchasing_command(
     if let Ok(cmd) = input.parse::<PurchasingCommand>() {
         match cmd {
             PurchasingCommand::Order => {
-                let _ = exec_order_pc(terminal, market, wallet, opt1, opt2, events, gauge);
+                let _ = exec_order_ps(terminal, market, wallet, opt1, opt2, events, gauge);
                 let _ = terminal.submit_input();
             }
         }
     }
 }
 
-fn exec_order_pc(
+fn exec_order_ps(
     terminal: &mut BakeryTerminal,
     market: &mut Market,
     wallet: &mut Wallet,
@@ -119,13 +119,14 @@ fn exec_order_pc(
         .and_then(|qty| if qty > 0.0 { Ok(qty) } else { Err(()) })?;
 
     let cost = market.calculate_cost(&ingredient, quantity);
-    if market.purchase(&ingredient, quantity).is_err() {
+    let ingredient_clone = ingredient.clone();
+    if market.purchase(&ingredient_clone, quantity).is_err() {
         terminal.add_input(MSG_NOT_ENOUGH_STOCK);
         return Err(());
     }
 
     if wallet.deduct_cash(cost as f64).is_err() {
-        market.restock(ingredient, quantity); // ロールバック
+        market.restock(ingredient.clone(), quantity); // Rollback
         terminal.add_input(MSG_NOT_ENOUGH_CASH);
         return Err(());
     }
@@ -134,31 +135,33 @@ fn exec_order_pc(
     gauge.start_timer(8.);
 
     // 購入した原料がpantryのリポジトリへ補充されるTransportation eventを発出
+    let mut purchase_data = Repository::new_raw_only();
+    purchase_data.update_ingredient(&ingredient, quantity);
     events.send(Transportation {
         from_term_id: terminal.id,
-        to_term_id: 1u8,                  // PantryのID
-        pack: Repository::new_raw_only(), // 仮のRepositoryを使用
+        to_term_id: 1u8, // PantryのID
+        pack: purchase_data,
     });
 
     terminal.add_input(&format!(
-        "Order command executed: {:?} x{} for {:.2} cash.",
-        ingredient, quantity, cost
+        "Purchased {} units of {} for {}.",
+        quantity, ingredient, cost
     ));
     Ok(())
 }
 
-fn exec_help_pc(terminal: &mut BakeryTerminal) {
+fn exec_help_ps(terminal: &mut BakeryTerminal) {
     terminal.add_input("Help command executed.");
 }
 
-fn exec_ls_pc(terminal: &mut BakeryTerminal, market_status: &str) {
+fn exec_ls_ps(terminal: &mut BakeryTerminal, market_status: &str) {
     terminal.add_input(market_status);
 }
 
-fn exec_mv_pc(terminal: &mut BakeryTerminal) {
+fn exec_mv_ps(terminal: &mut BakeryTerminal) {
     terminal.add_input("Mv command not available in Purchasing.");
 }
 
-fn exec_shoo_pc(terminal: &mut BakeryTerminal) {
+fn exec_shoo_ps(terminal: &mut BakeryTerminal) {
     terminal.add_input("Shoo command executed.");
 }

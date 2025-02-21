@@ -16,6 +16,22 @@ pub enum CoolingCommand {
     Cool,
 }
 
+pub fn operate_cooling(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Cooling>>,
+    mut events: EventReader<Emitation>,
+) {
+    if let Ok((mut terminal, mode)) = query.get_single_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_cl(command, &mut terminal);
+                handle_cooling_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 impl_from_str!(CoolingCommand, Proof => "proof", Cool => "cool");
 
 fn handle_cooling_command(input: &str, terminal: &mut BakeryTerminal) {
@@ -39,23 +55,6 @@ fn handle_general_in_cl(input: &str, terminal: &mut BakeryTerminal) {
         let _ = terminal.submit_input();
     }
 }
-
-pub fn operate_cooling(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Cooling>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_cl(command, &mut terminal);
-                handle_cooling_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
-    }
-}
-
 fn exec_proof_cl(terminal: &mut BakeryTerminal) {
     terminal.add_input("Proof command executed in Cooling");
 }

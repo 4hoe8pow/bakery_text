@@ -22,6 +22,8 @@ pub(super) mod operate_shaping;
 
 pub(super) mod operate_stockroom;
 
+pub(super) mod operate_pantry;
+
 pub(super) mod operate_waste_station;
 
 pub(super) mod market_fluctuations;

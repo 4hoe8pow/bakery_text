@@ -17,6 +17,22 @@ pub enum WasteStationCommand {
 
 impl_from_str!(WasteStationCommand, Dispose => "dispose");
 
+pub fn operate_waste_station(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<WasteStation>>,
+    mut events: EventReader<Emitation>,
+) {
+    if let Ok((mut terminal, mode)) = query.get_single_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_wt(command, &mut terminal);
+                handle_waste_station_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 fn handle_waste_station_command(input: &str, terminal: &mut BakeryTerminal) {
     if let Ok(cmd) = input.parse::<WasteStationCommand>() {
         match cmd {
@@ -35,22 +51,6 @@ fn handle_general_in_wt(input: &str, terminal: &mut BakeryTerminal) {
             GeneralCommand::Shoo => exec_shoo_wt(terminal),
         }
         let _ = terminal.submit_input();
-    }
-}
-
-pub fn operate_waste_station(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<WasteStation>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_wt(command, &mut terminal);
-                handle_waste_station_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
     }
 }
 

@@ -1,8 +1,12 @@
-use std::ops::{Add, Sub};
+use std::{
+    fmt,
+    ops::{Add, Sub},
+};
 
 use bevy::prelude::*;
 
 use super::bread::Bread;
+use crate::bt_resources::market::Ingredient;
 
 #[derive(Debug, Component)]
 pub struct ModalComponet;
@@ -130,6 +134,28 @@ impl Repository {
             bread: Some(vec![]),
         }
     }
+
+    pub fn new_empty() -> Self {
+        Self {
+            flour: None,
+            salt: None,
+            sugar: None,
+            butter: None,
+            yeast: None,
+            dough: None,
+            bread: None,
+        }
+    }
+
+    pub fn update_ingredient(&mut self, ingredient: &Ingredient, quantity: f32) {
+        match ingredient {
+            Ingredient::Flour => self.flour = Some(self.flour.unwrap_or(0.0) + quantity),
+            Ingredient::Salt => self.salt = Some(self.salt.unwrap_or(0.0) + quantity),
+            Ingredient::Sugar => self.sugar = Some(self.sugar.unwrap_or(0.0) + quantity),
+            Ingredient::Butter => self.butter = Some(self.butter.unwrap_or(0.0) + quantity),
+            Ingredient::Yeast => self.yeast = Some(self.yeast.unwrap_or(0.0) + quantity),
+        }
+    }
 }
 
 impl Add for Repository {
@@ -195,5 +221,68 @@ impl std::ops::AddAssign for Repository {
         if let Some(bread) = other.bread {
             self.bread = Some([self.bread.take().unwrap_or_default(), bread].concat());
         }
+    }
+}
+
+impl std::ops::SubAssign for Repository {
+    fn sub_assign(&mut self, other: Self) {
+        if let Some(flour) = other.flour {
+            self.flour = Some(self.flour.unwrap_or(0.0) - flour);
+        }
+        if let Some(salt) = other.salt {
+            self.salt = Some(self.salt.unwrap_or(0.0) - salt);
+        }
+        if let Some(sugar) = other.sugar {
+            self.sugar = Some(self.sugar.unwrap_or(0.0) - sugar);
+        }
+        if let Some(butter) = other.butter {
+            self.butter = Some(self.butter.unwrap_or(0.0) - butter);
+        }
+        if let Some(yeast) = other.yeast {
+            self.yeast = Some(self.yeast.unwrap_or(0.0) - yeast);
+        }
+        if let Some(dough) = other.dough {
+            self.dough = Some(self.dough.unwrap_or(0.0) - dough);
+        }
+        if let Some(bread) = other.bread {
+            if let Some(mut self_bread) = self.bread.take() {
+                for item in bread {
+                    if let Some(pos) = self_bread.iter().position(|x| *x == item) {
+                        self_bread.remove(pos);
+                    }
+                }
+                self.bread = Some(self_bread);
+            }
+        }
+    }
+}
+
+impl fmt::Display for Repository {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Product\t\tQuantity")?;
+        writeln!(f, "-------------------------")?;
+        if let Some(flour) = self.flour {
+            writeln!(f, "Flour\t\t{:.2}", flour)?;
+        }
+        if let Some(salt) = self.salt {
+            writeln!(f, "Salt\t\t\t{:.2}", salt)?;
+        }
+        if let Some(sugar) = self.sugar {
+            writeln!(f, "Sugar\t\t{:.2}", sugar)?;
+        }
+        if let Some(butter) = self.butter {
+            writeln!(f, "Butter\t\t{:.2}", butter)?;
+        }
+        if let Some(yeast) = self.yeast {
+            writeln!(f, "Yeast\t\t{:.2}", yeast)?;
+        }
+        if let Some(dough) = self.dough {
+            writeln!(f, "Dough\t\t{:.2}", dough)?;
+        }
+        if let Some(bread) = &self.bread {
+            writeln!(f, "Bread\t\t{}", bread.len())?;
+        }
+        writeln!(f, "-------------------------")?;
+        Ok(())
     }
 }

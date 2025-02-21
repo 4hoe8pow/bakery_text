@@ -16,6 +16,22 @@ pub enum MixingCommand {
     Mix,
 }
 
+pub fn operate_mixing(
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Mixing>>,
+    mut events: EventReader<Emitation>,
+) {
+    for (mut terminal, mode) in query.iter_mut() {
+        if let OperatorMode::Commander = mode {
+            for ev in events.read() {
+                let (command, opt1, opt2) = ev.split_command();
+                handle_general_in_mx(command, &mut terminal);
+                handle_mixing_command(command, &mut terminal);
+            }
+        }
+        // ...existing code...
+    }
+}
+
 impl_from_str!(MixingCommand, Add => "add", Mix => "mix");
 
 fn handle_mixing_command(input: &str, terminal: &mut BakeryTerminal) {
@@ -37,22 +53,6 @@ fn handle_general_in_mx(input: &str, terminal: &mut BakeryTerminal) {
             GeneralCommand::Shoo => exec_shoo_mx(terminal),
         }
         let _ = terminal.submit_input();
-    }
-}
-
-pub fn operate_mixing(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Mixing>>,
-    mut events: EventReader<Emitation>,
-) {
-    for (mut terminal, mode) in query.iter_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_mx(command, &mut terminal);
-                handle_mixing_command(command, &mut terminal);
-            }
-        }
-        // ...existing code...
     }
 }
 
