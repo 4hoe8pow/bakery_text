@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 #[derive(Event)]
-pub struct Emitation(pub String, pub u8);
+pub struct Emitation(pub String);
 
 impl Emitation {
     pub fn split_command(&self) -> (&str, Option<&str>, Option<&str>) {

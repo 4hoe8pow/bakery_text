@@ -31,7 +31,7 @@ pub fn handle_text_input(
                 .for_each(|ev| match &ev.logical_key {
                     Key::Enter => {
                         let input_text = term.submit_input();
-                        emit_command.send(Emitation(input_text, term.id));
+                        emit_command.send(Emitation(input_text));
                     }
                     Key::Backspace => {
                         term.remove_last_input();

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use super::operate_general_term::GeneralCommand;
 use crate::{
     bt_components::{
-        bakery_terminal::{BakeryTerminal, OperatorMode},
+        bakery_terminal::{BakeryTerminal, OperatorMode, Repository},
         sections::QualityControl,
     },
     bt_events::emitation::Emitation,
@@ -17,16 +17,14 @@ pub enum QualityControlCommand {
 }
 
 pub fn operate_quality_control(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<QualityControl>>,
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode, &Repository), With<QualityControl>>,
     mut events: EventReader<Emitation>,
 ) {
-    if let Ok((mut terminal, mode)) = query.get_single_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_qc(command, &mut terminal);
-                handle_quality_control_command(command, &mut terminal);
-            }
+    if let Ok((mut terminal, OperatorMode::Commander, repository)) = query.get_single_mut() {
+        for ev in events.read() {
+            let (command, opt1, opt2) = ev.split_command();
+            handle_general_qc(command, &mut terminal, repository);
+            handle_quality_control_command(command, &mut terminal);
         }
     }
 }
@@ -43,11 +41,11 @@ fn handle_quality_control_command(input: &str, terminal: &mut BakeryTerminal) {
     }
 }
 
-fn handle_general_qc(input: &str, terminal: &mut BakeryTerminal) {
+fn handle_general_qc(input: &str, terminal: &mut BakeryTerminal, repository: &Repository) {
     if let Ok(cmd) = input.parse::<GeneralCommand>() {
         match cmd {
             GeneralCommand::Help => exec_help_qc(terminal),
-            GeneralCommand::Ls => exec_ls_qc(terminal),
+            GeneralCommand::Ls => exec_ls_qc(terminal, repository),
             GeneralCommand::Mv => exec_mv_qc(terminal),
             GeneralCommand::Shoo => exec_shoo_qc(terminal),
         }
@@ -67,8 +65,8 @@ fn exec_help_qc(terminal: &mut BakeryTerminal) {
     terminal.add_input("Help command executed in Quality Control");
 }
 
-fn exec_ls_qc(terminal: &mut BakeryTerminal) {
-    terminal.add_input("Ls command executed in Quality Control");
+fn exec_ls_qc(terminal: &mut BakeryTerminal, repository: &Repository) {
+    terminal.add_input(&format!("Repository contents:\n{}", repository));
 }
 
 fn exec_mv_qc(terminal: &mut BakeryTerminal) {

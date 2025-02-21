@@ -225,7 +225,7 @@ fn add_section(
     operator_mode: OperatorMode,
     section: impl Component + Section + fmt::Display,
     font_teko: Handle<Font>,
-    icon: Handle<Image>,
+    image: Handle<Image>,
 ) {
     let help_text = format!("Type 'help' for {}", section);
 
@@ -238,10 +238,7 @@ fn add_section(
                 padding: UiRect::all(Val::Px(3.0)),
                 ..default()
             },
-            ImageNode {
-                image: icon,
-                ..default()
-            },
+            ImageNode { image, ..default() },
             BackgroundColor(Color::srgb_u8(210, 210, 210)),
             BorderRadius::all(Val::Px(12.)),
         ))
@@ -263,7 +260,6 @@ fn add_section(
                 TextLayout::new(JustifyText::Left, LineBreak::AnyCharacter),
                 BakeryTerminal {
                     id: section_id,
-                    input_buffer: String::new(),
                     history: vec![help_text],
                     ..Default::default()
                 },

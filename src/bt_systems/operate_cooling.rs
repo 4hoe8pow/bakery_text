@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use super::operate_general_term::GeneralCommand;
 use crate::{
     bt_components::{
-        bakery_terminal::{BakeryTerminal, OperatorMode},
+        bakery_terminal::{BakeryTerminal, OperatorMode, Repository},
         sections::Cooling,
     },
     bt_events::emitation::Emitation,
@@ -17,18 +17,15 @@ pub enum CoolingCommand {
 }
 
 pub fn operate_cooling(
-    mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<Cooling>>,
+    mut query: Query<(&mut BakeryTerminal, &OperatorMode, &Repository), With<Cooling>>,
     mut events: EventReader<Emitation>,
 ) {
-    if let Ok((mut terminal, mode)) = query.get_single_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_cl(command, &mut terminal);
-                handle_cooling_command(command, &mut terminal);
-            }
+    if let Ok((mut terminal, OperatorMode::Commander, repository)) = query.get_single_mut() {
+        for ev in events.read() {
+            let (command, opt1, opt2) = ev.split_command();
+            handle_general_in_cl(command, &mut terminal, repository);
+            handle_cooling_command(command, &mut terminal);
         }
-        // ...existing code...
     }
 }
 
@@ -44,11 +41,11 @@ fn handle_cooling_command(input: &str, terminal: &mut BakeryTerminal) {
     }
 }
 
-fn handle_general_in_cl(input: &str, terminal: &mut BakeryTerminal) {
+fn handle_general_in_cl(input: &str, terminal: &mut BakeryTerminal, repository: &Repository) {
     if let Ok(cmd) = input.parse::<GeneralCommand>() {
         match cmd {
             GeneralCommand::Help => exec_help_cl(terminal),
-            GeneralCommand::Ls => exec_ls_cl(terminal),
+            GeneralCommand::Ls => exec_ls_cl(terminal, repository),
             GeneralCommand::Mv => exec_mv_cl(terminal),
             GeneralCommand::Shoo => exec_shoo_cl(terminal),
         }
@@ -67,8 +64,8 @@ fn exec_help_cl(terminal: &mut BakeryTerminal) {
     terminal.add_input("Help command executed in Cooling");
 }
 
-fn exec_ls_cl(terminal: &mut BakeryTerminal) {
-    terminal.add_input("Ls command executed in Cooling");
+fn exec_ls_cl(terminal: &mut BakeryTerminal, repository: &Repository) {
+    terminal.add_input(&format!("Repository contents:\n{}", repository));
 }
 
 fn exec_mv_cl(terminal: &mut BakeryTerminal) {

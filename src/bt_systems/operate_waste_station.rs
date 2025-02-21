@@ -21,15 +21,12 @@ pub fn operate_waste_station(
     mut query: Query<(&mut BakeryTerminal, &OperatorMode), With<WasteStation>>,
     mut events: EventReader<Emitation>,
 ) {
-    if let Ok((mut terminal, mode)) = query.get_single_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_in_wt(command, &mut terminal);
-                handle_waste_station_command(command, &mut terminal);
-            }
+    if let Ok((mut terminal, OperatorMode::Commander)) = query.get_single_mut() {
+        for ev in events.read() {
+            let (command, opt1, opt2) = ev.split_command();
+            handle_general_in_wt(command, &mut terminal);
+            handle_waste_station_command(command, &mut terminal);
         }
-        // ...existing code...
     }
 }
 

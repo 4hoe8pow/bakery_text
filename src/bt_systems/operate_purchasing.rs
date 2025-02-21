@@ -38,22 +38,20 @@ pub fn operate_purchasing(
     mut wallet: ResMut<Wallet>,
     mut transportation_events: EventWriter<Transportation>,
 ) {
-    if let Ok((mut terminal, mode, mut gauge)) = query.get_single_mut() {
-        if let OperatorMode::Commander = mode {
-            for ev in events.read() {
-                let (command, opt1, opt2) = ev.split_command();
-                handle_general_ps(command, &mut terminal, &format!("{}", *market));
-                handle_purchasing_command(
-                    command,
-                    &mut terminal,
-                    &mut market,
-                    &mut wallet,
-                    opt1,
-                    opt2,
-                    &mut transportation_events,
-                    &mut gauge,
-                )
-            }
+    if let Ok((mut terminal, OperatorMode::Commander, mut gauge)) = query.get_single_mut() {
+        for ev in events.read() {
+            let (command, opt1, opt2) = ev.split_command();
+            handle_general_ps(command, &mut terminal, &format!("{}", *market));
+            handle_purchasing_command(
+                command,
+                &mut terminal,
+                &mut market,
+                &mut wallet,
+                opt1,
+                opt2,
+                &mut transportation_events,
+                &mut gauge,
+            )
         }
     }
 }
@@ -63,8 +61,8 @@ fn handle_general_ps(input: &str, terminal: &mut BakeryTerminal, market_status: 
         match cmd {
             GeneralCommand::Help => exec_help_ps(terminal),
             GeneralCommand::Ls => exec_ls_ps(terminal, market_status),
-            GeneralCommand::Mv => exec_mv_ps(terminal),
             GeneralCommand::Shoo => exec_shoo_ps(terminal),
+            _ => {}
         }
         let _ = terminal.submit_input();
     }
@@ -151,15 +149,11 @@ fn exec_order_ps(
 }
 
 fn exec_help_ps(terminal: &mut BakeryTerminal) {
-    terminal.add_input("Help command executed.");
+    terminal.add_input("Usage:\nod <ingredient> <quantity> - Order ingredients\nls - List market status\nshoo - Shoo command");
 }
 
 fn exec_ls_ps(terminal: &mut BakeryTerminal, market_status: &str) {
     terminal.add_input(market_status);
-}
-
-fn exec_mv_ps(terminal: &mut BakeryTerminal) {
-    terminal.add_input("Mv command not available in Purchasing.");
 }
 
 fn exec_shoo_ps(terminal: &mut BakeryTerminal) {

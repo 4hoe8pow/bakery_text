@@ -18,7 +18,7 @@ pub fn progress_gauge(
 
             next_state.set(PausedState::Freeze);
             terminal.add_input("||| ");
-            if gauge.progress <= 0 {
+            if gauge.progress == 0 {
                 terminal.add_input("\nCompleted.");
                 let _ = terminal.submit_input();
                 next_state.set(PausedState::Running);
