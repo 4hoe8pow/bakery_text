@@ -1,32 +1,38 @@
-import { useContext, useCallback } from "react";
-import { PantryCommands, LogLevel } from "../utils/Command";
+import { useCallback, useContext } from "react";
+import { LogLevel, type UsageCode } from "../bt.types";
 import { TerminalContext } from "../context/TerminalContext";
+import { PantryCommands } from "../utils/Command";
+import {
+    USAGE_ERROR_TERMINAL_CONTEXT,
+    USAGE_INGREDIENT_ITEM,
+    USAGE_UNKNOWN_PANTRY_COMMAND,
+} from "../utils/usage/usagePantry";
 
 export const usePantryCommand = (
-	addOutput: (message: string, level?: LogLevel) => void,
+    addOutput: (usage: UsageCode, level?: LogLevel) => void,
 ) => {
-	const terminalContext = useContext(TerminalContext);
+    const terminalContext = useContext(TerminalContext);
 
-	const checkExec = useCallback(() => {
-		if (!terminalContext) {
-			addOutput("Error: Terminal context not available", LogLevel.ERROR);
-			return;
-		}
+    const ingredientExec = useCallback(() => {
+        if (!terminalContext) {
+            addOutput(USAGE_ERROR_TERMINAL_CONTEXT, LogLevel.ERROR);
+            return;
+        }
 
-		const repository = terminalContext.repository;
+        const repository = terminalContext.repository;
 
-		for (const [key, value] of Object.entries(repository)) {
-			addOutput(`${key} = ${value.toFixed(3)} KG`, LogLevel.INFO);
-		}
-	}, [terminalContext, addOutput]);
+        for (const [key, value] of Object.entries(repository)) {
+            addOutput(USAGE_INGREDIENT_ITEM(key, value), LogLevel.INFO);
+        }
+    }, [terminalContext, addOutput]);
 
-	return (cmd: PantryCommands) => {
-		switch (cmd) {
-			case PantryCommands.CHECK:
-				checkExec();
-				break;
-			default:
-				addOutput(`Unknown pantry command: ${cmd}`, LogLevel.ERROR);
-		}
-	};
+    return (cmd: PantryCommands) => {
+        switch (cmd) {
+            case PantryCommands.INGREDIENT:
+                ingredientExec();
+                break;
+            default:
+                addOutput(USAGE_UNKNOWN_PANTRY_COMMAND(cmd), LogLevel.ERROR);
+        }
+    };
 };

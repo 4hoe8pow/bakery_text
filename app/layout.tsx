@@ -1,37 +1,33 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { DotGothic16 } from "next/font/google";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
-	subsets: ["latin"],
+const dotGothic16 = DotGothic16({
+    subsets: ["latin"],
+    weight: "400",
 });
 
 export const metadata: Metadata = {
-	title: "Bakery Text",
-	description: "文字だけでパンを焼くミニゲームです。",
+    title: "Bakery Text",
+    description: "文字だけでパンを焼き続けるミニゲームです。",
 };
 
 export default function RootLayout({
-	children,
+    children,
 }: Readonly<{
-	children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-	return (
-		<html lang="ja">
-			<head>
-				<link rel="stylesheet" href="https://jdan.github.io/98.css/98.css" />
-			</head>
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<main>{children}</main>
-			</body>
-		</html>
-	);
+    return (
+        <html lang="ja">
+            <head>
+                <link
+                    rel="stylesheet"
+                    href="https://jdan.github.io/98.css/98.css"
+                />
+            </head>
+            <body className={`${dotGothic16.className} antialiased`}>
+                <main>{children}</main>
+            </body>
+        </html>
+    );
 }

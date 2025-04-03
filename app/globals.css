@@ -1,41 +1,65 @@
 @import "tailwindcss";
 
 :root {
-	--background: #ffffff;
-	--foreground: #171717;
+    --background: #ededed;
+    --foreground: #0a0a0a;
 }
 
 @theme inline {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
 }
 
 @media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+    :root {
+        --background: #0a0a0a;
+        --foreground: #ededed;
+    }
 }
 
 body {
-	background: var(--background);
-	color: var(--foreground);
-	font-family: Arial, Helvetica, sans-serif;
+    background: var(--background);
+    color: var(--foreground);
 }
 
 @keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes glitch {
+    0% {
+        text-shadow: 3px 0 red, -3px 0 cyan, 2px 2px magenta;
+        transform: translate(1px, -1px);
+    }
+    25% {
+        text-shadow: -3px 0 blue, 3px 0 yellow, -2px -2px lime;
+        transform: translate(-1px, 2px);
+    }
+    50% {
+        text-shadow: 3px -1px magenta, -3px 1px cyan, 2px 2px orange;
+        transform: translate(2px, -1px);
+    }
+    75% {
+        text-shadow: -3px 1px lime, 3px -1px red, -2px -2px yellow;
+        transform: translate(-1px, 2px);
+    }
+    100% {
+        text-shadow: 3px 0 red, -3px 0 cyan, 2px 2px magenta;
+        transform: translate(2px, -1px);
+    }
 }
 
 @layer utilities {
-	.animate-fade-in {
-		animation: fade-in 0.2s ease-in-out forwards;
-	}
+    .animate-fade-in {
+        animation: fade-in 0.2s ease-in-out forwards;
+    }
+
+    .glitch {
+        animation: glitch 0.1s infinite steps(2, end);
+    }
 }

@@ -1,15 +1,13 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from "react";
+import { memo, useContext, useEffect, useRef, useState } from "react";
 import { type Terminal, TerminalContext } from "../context/TerminalContext";
-import { TerminalSectionId } from "../utils/Command";
+import { NewsContainer } from "./NewsContainer";
 import { ProgressIndicator } from "./ProgressIndicator";
+import { StatusBar } from "./StatusBar";
+import { TitleBar } from "./TitleBar";
 
-export const MyTerminalWindow = ({
-	id,
-	position: initialPosition,
-	news,
-}: Terminal) => {
+const TerminalWindow = ({ id, position: initialPosition, news }: Terminal) => {
 	const terminalContext = useContext(TerminalContext);
 	if (!terminalContext) return null;
 
@@ -20,7 +18,6 @@ export const MyTerminalWindow = ({
 
 	const [position, setPosition] = useState(initialPosition);
 	const [isMinimized, setIsMinimized] = useState(false);
-
 	const [isDragging, setIsDragging] = useState(false);
 	const dragStartPos = useRef({ x: 0, y: 0 });
 
@@ -30,6 +27,10 @@ export const MyTerminalWindow = ({
 			x: e.clientX - position.x,
 			y: e.clientY - position.y,
 		};
+	};
+
+	const handleWindowMouseDown = () => {
+		updateTerminalPosition(id, position); // ウィンドウ全体に触れたときにzIndexを更新
 	};
 
 	useEffect(() => {
@@ -46,19 +47,13 @@ export const MyTerminalWindow = ({
 				const windowWidthElement = windowElement.clientWidth;
 				const windowHeightElement = windowElement.clientHeight;
 
-				// 新しい位置を計算
 				let newX = e.clientX - dragStartPos.current.x;
 				let newY = e.clientY - dragStartPos.current.y;
 
-				// 画面からはみ出さないように制限
 				newX = Math.max(0, Math.min(newX, windowWidth - windowWidthElement));
 				newY = Math.max(0, Math.min(newY, windowHeight - windowHeightElement));
 
-				setPosition({
-					x: newX,
-					y: newY,
-					z: position.z,
-				});
+				setPosition({ x: newX, y: newY, z: position.z });
 			}
 		};
 
@@ -91,51 +86,22 @@ export const MyTerminalWindow = ({
 					top: `${position.y}px`,
 					zIndex: position.z,
 				}}
+				onMouseDown={handleWindowMouseDown}
 			>
-				<div
-					className={`title-bar cursor-grab ${isDragging ? "cursor-grabbing" : ""}`}
-					onMouseDown={handleMouseDown}
-				>
-					<div className="title-bar-text">Terminal {TerminalSectionId[id]}</div>
-					<div className="title-bar-controls">
-						<button
-							type="button"
-							aria-label="Minimize"
-							onClick={() => setIsMinimized(true)}
-						/>
-						<button
-							type="button"
-							aria-label="Maximize"
-							onClick={() => setIsMinimized(false)}
-						/>
-						<button
-							type="button"
-							aria-label="Close"
-							onClick={() => deactivateTerminal(id)}
-						/>
-					</div>
-				</div>
+				<TitleBar
+					isDragging={isDragging}
+					handleMouseDown={handleMouseDown}
+					setIsMinimized={setIsMinimized}
+					deactivateTerminal={() => deactivateTerminal(id)}
+					terminal={terminal}
+				/>
 				{!isMinimized && (
-					<div className="window-body max-h-[278px] w-[450px] overflow-y-scroll">
-						{news.map((item) => (
-							<div key={item.id} className="flex flex-row space-x-4">
-								<p>[&nbsp;{item.datetime.toISOString()}&nbsp;]</p>
-								<strong>{item.description}</strong>
-							</div>
-						))}
-					</div>
+					<NewsContainer
+						news={news}
+						terminalStatus={terminal.statusText.terminalStatus}
+					/>
 				)}
-				<div className="status-bar">
-					<p className="status-bar-field">
-						{terminal.statusText.terminalStatus === "HEALTHY" ? (
-							<span className="text-lime-300 mr-2">✔</span>
-						) : (
-							<span className="text-lime-900 mr-2">✖</span>
-						)}
-						{terminal.statusText.terminalStatus}
-					</p>
-					<p className="status-bar-field">{terminal.statusText.sectionText}</p>
-				</div>
+				<StatusBar terminal={terminal} />
 				{terminal.progress > 0 && (
 					<ProgressIndicator progress={terminal.progress} />
 				)}
@@ -143,3 +109,5 @@ export const MyTerminalWindow = ({
 		)
 	);
 };
+
+export default memo(TerminalWindow);

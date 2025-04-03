@@ -1,19 +1,25 @@
+import { useCallback, useContext } from "react";
+import { LogLevel, type UsageCode } from "../bt.types";
+import { TerminalContext } from "../context/TerminalContext";
 import { UtilitiesCommands } from "../utils/Command";
-import { LogLevel } from "../utils/Command";
+import { USAGE_UNKNOWN_UTILITIES_COMMAND } from "../utils/usage/usageUtilities";
 
 export const useUtilitiesCommand = (
-	addOutput: (message: string, level?: LogLevel) => void,
+    addOutput: (usage: UsageCode, level?: LogLevel) => void,
 ) => {
-	return (cmd: UtilitiesCommands, ...args: string[]) => {
-		switch (cmd) {
-			case UtilitiesCommands.ENABLE:
-				addOutput("Utility enabled.", LogLevel.INFO);
-				break;
-			case UtilitiesCommands.DISABLE:
-				addOutput("Utility disabled.");
-				break;
-			default:
-				addOutput(`Unknown utilities command: ${cmd}`, LogLevel.ERROR);
-		}
-	};
+    const context = useContext(TerminalContext);
+    if (!context) {
+        throw new Error("TerminalContext is not available");
+    }
+    const fooExec = useCallback(() => {}, []);
+
+    return (cmd: UtilitiesCommands) => {
+        switch (cmd) {
+            case UtilitiesCommands.ENABLE:
+                fooExec();
+                break;
+            default:
+                addOutput(USAGE_UNKNOWN_UTILITIES_COMMAND(cmd), LogLevel.ERROR);
+        }
+    };
 };
