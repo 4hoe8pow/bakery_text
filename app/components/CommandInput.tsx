@@ -77,7 +77,7 @@ export const CommandInput = ({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="!bg-green-950 !shadow-none flex-grow caret-green-500"
+                className="!shadow-none !bg-transparent flex-grow caret-green-500"
                 disabled={!isInputEnabled}
                 title="Command Input"
                 placeholder="Type your command here"

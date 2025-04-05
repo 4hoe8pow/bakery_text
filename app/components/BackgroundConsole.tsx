@@ -232,7 +232,7 @@ export const BackgroundConsole = () => {
     };
 
     return (
-        <div className="flex max-h-screen w-full flex-col rounded-xl border-2 border-green-300 bg-green-950 p-4 text-white">
+        <div className="crt-grid crt-effect crt-flicker crt-noise crt-glass flex max-h-screen w-full flex-col rounded-t-2xl border-2 border-green-300 p-2 text-white">
             {/* 出力ログを表示 */}
             <div className="flex-grow overflow-y-auto">
                 <OutputLogger output={output} />
