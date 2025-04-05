@@ -69,7 +69,7 @@ export const CommandInput = ({
     }, [inputRef, isInputEnabled]);
 
     return (
-        <div className="flex w-full font-bold">
+        <div className="mt-1.5 flex w-full font-bold">
             <PromptDisplay cash={cash} mode={mode} />
             <input
                 ref={inputRef}
@@ -77,8 +77,10 @@ export const CommandInput = ({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="!bg-[#0a0a0a] !shadow-none flex-grow caret-green-500"
+                className="!bg-green-950 !shadow-none flex-grow caret-green-500"
                 disabled={!isInputEnabled}
+                title="Command Input"
+                placeholder="Type your command here"
             />
         </div>
     );
