@@ -12,7 +12,7 @@ const calcSize = (news: News[]): number =>
 /** ニュースリストを1KB以下にトリム */
 const trimNews = (news: News[]): News[] => {
     let totalSize = calcSize(news);
-    while (totalSize > 1024 && news.length > 1) {
+    while (totalSize > 1024 * 8 && news.length > 1) {
         news.shift(); // 古いニュースから削除
         totalSize = calcSize(news);
     }

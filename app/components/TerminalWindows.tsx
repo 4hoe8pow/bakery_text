@@ -96,24 +96,17 @@ export const TerminalWindows = () => {
 
     // FIXME
     useEffect(() => {
-        const timers: NodeJS.Timeout[] = [];
+        const intervalId = setInterval(() => {
+            for (const terminal of terminals) {
+                handleNormalActivity(terminal);
+                if (Math.random() < terminal.troubleProbability) {
+                    handleTrouble(terminal);
+                }
+            }
+        }, 8000); // 全ターミナルに対して8秒ごとに処理
 
-        terminals.forEach((terminal, index) => {
-            const timer = setTimeout(() => {
-                setInterval(() => {
-                    handleNormalActivity(terminal);
-                    if (Math.random() < terminal.troubleProbability) {
-                        handleTrouble(terminal);
-                    }
-                }, 8000); // 8秒ごとに実行
-            }, index * 1000); // 1秒ずつずらして開始
-            timers.push(timer);
-        });
-
-        return () => {
-            timers.forEach(clearTimeout);
-        };
-    }, [terminals, handleTrouble, handleNormalActivity]);
+        return () => clearInterval(intervalId); // クリーンアップ
+    }, [terminals, handleNormalActivity, handleTrouble]);
 
     return (
         <>
