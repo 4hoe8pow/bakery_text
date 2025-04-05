@@ -28,7 +28,7 @@ const PromptDisplay = ({
     );
 };
 
-// コマンド入力を処理するコンポーネント
+// ｺﾏﾝﾄﾞ入力を処理するコンポーネント
 export const CommandInput = ({
     input,
     mode,
@@ -49,7 +49,7 @@ export const CommandInput = ({
         throw new Error("TerminalContext is not available");
     }
 
-    const { cash } = context;
+    const { cash, isGameOver } = context;
 
     // 入力フィールドにフォーカス
     useEffect(() => {
@@ -69,7 +69,7 @@ export const CommandInput = ({
     }, [inputRef, isInputEnabled]);
 
     return (
-        <div className="flex w-full font-bold">
+        <div className="mt-1.5 flex w-full font-bold">
             <PromptDisplay cash={cash} mode={mode} />
             <input
                 ref={inputRef}
@@ -77,8 +77,10 @@ export const CommandInput = ({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="!bg-[#0a0a0a] !shadow-none flex-grow caret-green-500"
-                disabled={!isInputEnabled}
+                className="!shadow-none !bg-transparent flex-grow caret-green-500"
+                disabled={!isInputEnabled || isGameOver !== null}
+                title="Command Input"
+                placeholder="Type your command here"
             />
         </div>
     );

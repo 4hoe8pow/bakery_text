@@ -1,17 +1,31 @@
 "use client";
 
 import { useCallback, useContext, useEffect } from "react";
-import { type Terminal, TerminalContext } from "../context/TerminalContext";
+import { TerminalContext, TerminalSectionId } from "../context/TerminalContext";
 import { useAbnormalHandlers } from "../hooks/useAbnormalHandlers";
 import { useNormalHandlers } from "../hooks/useNormalHandlers";
+import { USAGE_HEAL, USAGE_RODENT_ALERT } from "../utils/usage/usageGeneral";
 import TerminalWindowUnit from "./TerminalWindowUnit";
+import { type Terminal, TerminalStatus } from "../bt.types";
 
 export const TerminalWindows = () => {
     const context = useContext(TerminalContext);
     if (!context) {
         return null;
     }
-    const { terminals } = context;
+    const {
+        terminals,
+        addNews,
+        maintainEquipment,
+        productionSpeed,
+        wearEquipment,
+        accumulateWaste,
+        increaseRodents,
+        attemptTrapCatch,
+        isGameOver,
+        updateIsGameOver,
+        nigiwai,
+    } = context;
 
     const abnormalHandlers = useAbnormalHandlers(context);
     const normalHandlers = useNormalHandlers(context);
@@ -55,38 +69,38 @@ export const TerminalWindows = () => {
         [abnormalHandlers],
     );
 
-    const handleNormalActivity = useCallback(
+    const handleNormalBatch = useCallback(
         (terminal: Terminal) => {
             switch (terminal.id) {
                 case 0:
-                    normalHandlers.handlePurchasingActivity();
+                    normalHandlers.handlePurchasingBatch();
                     break;
                 case 1:
-                    normalHandlers.handlePantryActivity();
+                    normalHandlers.handlePantryBatch();
                     break;
                 case 2:
-                    normalHandlers.handleMixingActivity();
+                    normalHandlers.handleMixingBatch();
                     break;
                 case 3:
-                    normalHandlers.handleCoolingActivity();
+                    normalHandlers.handleCoolingBatch();
                     break;
                 case 4:
-                    normalHandlers.handleShapingActivity();
+                    normalHandlers.handleShapingBatch();
                     break;
                 case 5:
-                    normalHandlers.handleBakingActivity();
+                    normalHandlers.handleBakingBatch();
                     break;
                 case 6:
-                    normalHandlers.handlePackagingActivity();
+                    normalHandlers.handlePackagingBatch();
                     break;
                 case 7:
-                    normalHandlers.handleSalesFrontActivity();
+                    normalHandlers.handleSalesFrontBatch();
                     break;
                 case 8:
-                    normalHandlers.handleWasteActivity();
+                    normalHandlers.handleWasteBatch();
                     break;
                 case 9:
-                    normalHandlers.handleUtilitiesActivity();
+                    normalHandlers.handleUtilitiesBatch();
                     break;
                 default:
             }
@@ -94,26 +108,89 @@ export const TerminalWindows = () => {
         [normalHandlers],
     );
 
-    // FIXME
+    const applyDamage = useCallback(
+        (terminalId: TerminalSectionId) => {
+            const damage = Math.random() * 3; // 0から3の乱数
+            wearEquipment(terminalId, damage);
+        },
+        [wearEquipment],
+    );
+
+    const applyWaste = useCallback(
+        (terminalId: TerminalSectionId) => {
+            if (terminalId !== TerminalSectionId.Waste) {
+                const wasteAmount = Math.random();
+                accumulateWaste(terminalId, wasteAmount);
+            }
+        },
+        [accumulateWaste],
+    );
+
+    const applyRodents = useCallback(
+        (terminalId: TerminalSectionId) => {
+            increaseRodents(terminalId, 1);
+        },
+        [increaseRodents],
+    );
+
+    // パン工房稼働
     useEffect(() => {
-        const timers: NodeJS.Timeout[] = [];
+        const intervals = terminals.map((terminal) =>
+            setInterval(() => {
+                if (isGameOver) return;
 
-        terminals.forEach((terminal, index) => {
-            const timer = setTimeout(() => {
-                setInterval(() => {
-                    handleNormalActivity(terminal);
-                    if (Math.random() < terminal.troubleProbability) {
+                attemptTrapCatch(terminal.id);
+
+                if (terminal.barometer.rodentCount > 0) {
+                    addNews(terminal.id, USAGE_RODENT_ALERT);
+                }
+
+                switch (terminal.status) {
+                    case TerminalStatus.ON_BREAK:
+                        maintainEquipment(terminal.id, nigiwai);
+                        addNews(terminal.id, USAGE_HEAL);
+                        break;
+                    case TerminalStatus.HEALTHY:
+                        handleNormalBatch(terminal);
+                        if (Math.random() < terminal.troubleProbability) {
+                            handleTrouble(terminal);
+                        }
+                        if (Math.random() < terminal.troubleProbability) {
+                            applyRodents(terminal.id);
+                        }
+                        if (Math.random() < terminal.troubleProbability) {
+                            applyWaste(terminal.id);
+                        }
+                        if (Math.random() < terminal.troubleProbability) {
+                            applyDamage(terminal.id);
+                        }
+                        break;
+                    default:
+                        applyDamage(terminal.id);
                         handleTrouble(terminal);
-                    }
-                }, 8000); // 8秒ごとに実行
-            }, index * 1000); // 1秒ずつずらして開始
-            timers.push(timer);
-        });
+                        break;
+                }
 
-        return () => {
-            timers.forEach(clearTimeout);
-        };
-    }, [terminals, handleTrouble, handleNormalActivity]);
+                updateIsGameOver();
+            }, productionSpeed),
+        );
+
+        return () => intervals.forEach(clearInterval);
+    }, [
+        terminals,
+        handleTrouble,
+        nigiwai,
+        handleNormalBatch,
+        applyDamage,
+        applyWaste,
+        isGameOver,
+        maintainEquipment,
+        addNews,
+        attemptTrapCatch,
+        applyRodents,
+        productionSpeed,
+        updateIsGameOver,
+    ]);
 
     return (
         <>

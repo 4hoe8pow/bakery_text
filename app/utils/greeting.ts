@@ -2,26 +2,25 @@ import { LogLevel } from "../bt.types";
 
 export const greeting = [
     {
-        message: "==== ==== ==== ==== ==== ==== ==== ==== ==== ==== ====",
+        message: "🎉 Welcome to TEXT Bakery!",
         level: LogLevel.INFO,
     },
     {
-        message: "🍞 Welcome to the bakery! This shop is named 'TEXT'.",
-        level: LogLevel.INFO,
-    },
-    {
-        message:
-            "✅ You generate revenue through bread production and sales, with your final revenue at game over serving as your score.",
+        message: "🍞 This is a text-only world—everything happens with words!",
         level: LogLevel.INFO,
     },
     {
         message:
-            "👹 Aim for a high score by managing ingredient inventory and eliminating intruders.",
+            "🤖 Bread baking is mostly automatic. You just seal the packages and fix machines!",
         level: LogLevel.INFO,
     },
     {
         message:
-            "💖 Type commands after the '$' prompt and press Enter to execute them. For example, try 'help'!",
+            "💰 The currency in this world is called Julopow. At game over, your Julopow earnings are your score!",
+        level: LogLevel.INFO,
+    },
+    {
+        message: "👉 Try it now: type `$ help` and press Enter!",
         level: LogLevel.INFO,
     },
     {

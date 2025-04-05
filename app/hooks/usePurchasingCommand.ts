@@ -4,9 +4,8 @@ import {
     useCallback,
     useContext,
 } from "react";
-import { LogLevel, type UsageCode } from "../bt.types";
+import { type Ingredient, LogLevel, type UsageCode } from "../bt.types";
 import { TerminalContext, TerminalSectionId } from "../context/TerminalContext";
-import type { Ingredient } from "../context/TerminalContext";
 import { PurchasingCommands } from "../utils/Command";
 import { USAGE_EMPTY } from "../utils/usage/usageGeneral";
 import {
@@ -77,6 +76,10 @@ export const usePurchasingCommand = (
                         spinnerIndex = (spinnerIndex + 1) % spinner.length;
 
                         if (progress >= 100) {
+                            context.updateProgress(
+                                TerminalSectionId.Purchasing,
+                                100,
+                            );
                             clearInterval(intervalId);
                             resolve();
                         }

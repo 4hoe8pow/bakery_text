@@ -1,11 +1,12 @@
 "use client";
 
 import { memo, useContext, useEffect, useRef, useState } from "react";
-import { type Terminal, TerminalContext } from "../context/TerminalContext";
+import { TerminalContext } from "../context/TerminalContext";
 import { NewsContainer } from "./NewsContainer";
 import { ProgressIndicator } from "./ProgressIndicator";
 import { StatusBar } from "./StatusBar";
 import { TitleBar } from "./TitleBar";
+import { type Terminal, TerminalStatus } from "../bt.types";
 
 const TerminalWindowUnit = ({
     id,
@@ -15,8 +16,12 @@ const TerminalWindowUnit = ({
     const terminalContext = useContext(TerminalContext);
     if (!terminalContext) return null;
 
-    const { terminals, updateTerminalPosition, deactivateTerminal } =
-        terminalContext;
+    const {
+        terminals,
+        updateTerminalPosition,
+        deactivateTerminal,
+        isGameOver,
+    } = terminalContext;
     const terminal = terminals.find((t) => t.id === id);
     if (!terminal) return null;
 
@@ -24,6 +29,7 @@ const TerminalWindowUnit = ({
     const [isMinimized, setIsMinimized] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const dragStartPos = useRef({ x: 0, y: 0 });
+    const isHealthy = terminal.status === TerminalStatus.HEALTHY;
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         setIsDragging(true);
@@ -88,7 +94,8 @@ const TerminalWindowUnit = ({
     }, [id, isDragging, position, updateTerminalPosition]);
 
     return (
-        terminal.visible && (
+        terminal.visible &&
+        !isGameOver && (
             <div
                 className="window absolute animate-fade-in opacity-0 transition-opacity duration-300 ease-in-out"
                 style={{
@@ -108,12 +115,15 @@ const TerminalWindowUnit = ({
                 {!isMinimized && (
                     <NewsContainer
                         news={news}
-                        terminalStatus={terminal.statusText.terminalStatus}
+                        terminalStatus={terminal.status}
                     />
                 )}
                 <StatusBar terminal={terminal} />
                 {terminal.progress > 0 && (
-                    <ProgressIndicator progress={terminal.progress} />
+                    <ProgressIndicator
+                        progress={terminal.progress}
+                        isHealthy={isHealthy}
+                    />
                 )}
             </div>
         )

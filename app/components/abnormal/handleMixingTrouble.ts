@@ -1,10 +1,17 @@
+import { TerminalStatus } from "@/app/bt.types";
 import {
     type TerminalContextType,
     TerminalSectionId,
 } from "@/app/context/TerminalContext";
-import { USAGE_TEXTS } from "@/app/utils/usage/usageGeneral";
+import { USAGE_FOREIGN_OBJECT_DETECTED } from "@/app/utils/usage/usageMixing";
 
 export const handleMixingTrouble = (context: TerminalContextType) => {
-    const { addNews } = context;
-    addNews(TerminalSectionId.Mixing, USAGE_TEXTS.MIXING_TROUBLE);
+    const { addNews, updateTerminalStatus } = context;
+
+    updateTerminalStatus(
+        TerminalSectionId.Mixing,
+        TerminalStatus.CONTAMINATION_DETECTED,
+    );
+
+    addNews(TerminalSectionId.Mixing, USAGE_FOREIGN_OBJECT_DETECTED);
 };

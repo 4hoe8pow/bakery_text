@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { DotGothic16 } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const dotGothic16 = DotGothic16({
     subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
             </head>
             <body className={`${dotGothic16.className} antialiased`}>
                 <main>{children}</main>
+                <SpeedInsights />
             </body>
         </html>
     );

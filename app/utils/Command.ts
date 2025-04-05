@@ -1,42 +1,43 @@
 export enum GeneralCommands {
-    LS = "ls",
-    TERM = "term",
-    MODE = "mode",
-    HELP = "help",
-    EN = "en",
-    JA = "ja",
+    LS = "ls", // 各ｾｸｼｮﾝの一覧
+    TERM = "term", // ﾀｰﾐﾅﾙの管理
+    MODE = "mode", // モードの移動
+    HELP = "help", // ヘルプ
+    EN = "en", // 英語モード
+    JA = "ja", // 日本語モード
+    REST = "rest", // ﾀｰﾐﾅﾙの回復モード起動
+    WORK = "work", // ﾀｰﾐﾅﾙの稼働モード起動
+    DISPOSE = "dispose", // ごみ処分
+    TRAP = "trap", // ﾈｽﾞﾐ捕り
 }
 
 export enum PurchasingCommands {
-    BUY = "buy",
+    BUY = "buy", // 原料の調達
 }
 
 export enum PantryCommands {
-    INGREDIENT = "ing",
+    INGREDIENT = "ing", // 原料の確認
+    BREAD = "bread", // パンの確認
 }
 
 export enum MixingCommands {
-    START = "start",
-    STOP = "stop",
+    PLAN = "plan", // 製造計画の確認
+    REPAIR = "repair", // 設備の改修
 }
 
 export enum CoolingCommands {
-    ACTIVATE = "activate",
-    DEACTIVATE = "deactivate",
+    REPAIR = "repair", // 設備の改修
 }
 
 export enum ShapingCommands {
-    FORM = "form",
-    RESET = "reset",
+    REPAIR = "repair", // 設備の改修
 }
 
 export enum BakingCommands {
-    PREHEAT = "preheat",
-    BAKE = "bake",
+    REPAIR = "repair", // 設備の改修
 }
 
 export enum PackagingCommands {
-    WRAP = "wrap",
     SEAL = "seal",
 }
 
@@ -46,11 +47,9 @@ export enum SalesFrontCommands {
 }
 
 export enum WasteCommands {
-    DISPOSE = "dispose",
     RECYCLE = "recycle",
 }
 
 export enum UtilitiesCommands {
-    ENABLE = "enable",
-    DISABLE = "disable",
+    TEMP = "temp", // 室温の調整
 }

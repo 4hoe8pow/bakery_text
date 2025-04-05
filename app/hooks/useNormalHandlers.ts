@@ -1,27 +1,27 @@
 import type { TerminalContextType } from "@/app/context/TerminalContext";
-import { handleBakingActivity } from "../components/normal/handleBakingActivity";
-import { handleCoolingActivity } from "../components/normal/handleCoolingActivity";
-import { handleMixingActivity as mixingActivityHandler } from "../components/normal/handleMixingActivity";
-import { handlePackagingActivity } from "../components/normal/handlePackagingActivity";
-import { handlePantryActivity } from "../components/normal/handlePantryActivity";
-import { handlePurchasingActivity } from "../components/normal/handlePurchasingActivity";
-import { handleSalesFrontActivity } from "../components/normal/handleSalesFrontActivity";
-import { handleShapingActivity } from "../components/normal/handleShapingActivity";
-import { handleUtilitiesActivity } from "../components/normal/handleUtilitiesActivity";
-import { handleWasteActivity } from "../components/normal/handleWasteActivity";
+import { handleBakingBatch } from "../components/normal/handleBakingBatch";
+import { handleCoolingBatch } from "../components/normal/handleCoolingBatch";
+import { handleMixingBatch as mixingBatchHandler } from "../components/normal/handleMixingBatch";
+import { handlePackagingBatch } from "../components/normal/handlePackagingBatch";
+import { handlePantryBatch } from "../components/normal/handlePantryBatch";
+import { handlePurchasingBatch } from "../components/normal/handlePurchasingBatch";
+import { handleSalesFrontBatch } from "../components/normal/handleSalesFrontBatch";
+import { handleShapingBatch } from "../components/normal/handleShapingBatch";
+import { handleUtilitiesBatch } from "../components/normal/handleUtilitiesBatch";
+import { handleWasteBatch } from "../components/normal/handleWasteBatch";
 import {} from "../utils/usage/usageMixing";
 
 export const useNormalHandlers = (context: TerminalContextType) => {
     return {
-        handlePurchasingActivity: () => handlePurchasingActivity(context),
-        handlePantryActivity: () => handlePantryActivity(context),
-        handleMixingActivity: () => mixingActivityHandler(context),
-        handleCoolingActivity: () => handleCoolingActivity(context),
-        handleShapingActivity: () => handleShapingActivity(context),
-        handleBakingActivity: () => handleBakingActivity(context),
-        handlePackagingActivity: () => handlePackagingActivity(context),
-        handleSalesFrontActivity: () => handleSalesFrontActivity(context),
-        handleWasteActivity: () => handleWasteActivity(context),
-        handleUtilitiesActivity: () => handleUtilitiesActivity(context),
+        handlePurchasingBatch: () => handlePurchasingBatch(context),
+        handlePantryBatch: () => handlePantryBatch(context),
+        handleMixingBatch: () => mixingBatchHandler(context),
+        handleCoolingBatch: () => handleCoolingBatch(context),
+        handleShapingBatch: () => handleShapingBatch(context),
+        handleBakingBatch: () => handleBakingBatch(context),
+        handlePackagingBatch: () => handlePackagingBatch(context),
+        handleSalesFrontBatch: () => handleSalesFrontBatch(context),
+        handleWasteBatch: () => handleWasteBatch(context),
+        handleUtilitiesBatch: () => handleUtilitiesBatch(context),
     };
 };

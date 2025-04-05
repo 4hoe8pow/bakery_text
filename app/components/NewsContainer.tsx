@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
+import { type News, TerminalStatus } from "../bt.types";
 
 export const NewsContainer = ({
     news,
     terminalStatus,
 }: {
-    news: { id: string; datetime: Date; description: string }[];
-    terminalStatus: string;
+    news: News[];
+    terminalStatus: TerminalStatus;
 }) => {
     const newsContainerRef = useRef<HTMLDivElement>(null);
     const prevNewsLength = useRef(news.length);
@@ -13,7 +14,9 @@ export const NewsContainer = ({
     useEffect(() => {
         if (!newsContainerRef.current) return;
 
-        const isHealthy = terminalStatus === "HEALTHY";
+        const isHealthy =
+            terminalStatus === TerminalStatus.HEALTHY ||
+            terminalStatus === TerminalStatus.ON_BREAK;
         if (news.length > prevNewsLength.current && !isHealthy) {
             const items = newsContainerRef.current.children;
             if (items.length > 0) {
@@ -37,12 +40,20 @@ export const NewsContainer = ({
     return (
         <div
             ref={newsContainerRef}
-            className="window-body max-h-[278px] w-[450px] overflow-y-scroll"
+            className="window-body max-h-[340px] w-[550px] overflow-y-scroll text-base"
         >
             {news.map((item) => (
                 <div key={item.id} className="flex flex-row space-x-4">
-                    <p>[&nbsp;{item.datetime.toISOString()}&nbsp;]</p>
-                    <strong>{item.description}</strong>
+                    <p className="min-w-max flex-shrink-0 whitespace-nowrap">
+                        [&nbsp;{item.datetime.toISOString()}&nbsp;]
+                    </p>
+                    <strong
+                        className={`flex-1 break-words ${
+                            item.isOverbearing ? "text-red-900" : ""
+                        }`}
+                    >
+                        {item.description}
+                    </strong>
                 </div>
             ))}
         </div>

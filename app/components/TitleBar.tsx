@@ -1,4 +1,5 @@
-import { TerminalSectionId, type Terminal } from "../context/TerminalContext";
+import type { Terminal } from "../bt.types";
+import { TerminalSectionId } from "../context/TerminalContext";
 
 export const TitleBar = ({
     isDragging,
@@ -17,7 +18,8 @@ export const TitleBar = ({
         className={`title-bar cursor-grab ${isDragging ? "cursor-grabbing" : ""}`}
         onMouseDown={handleMouseDown}
     >
-        <div className="title-bar-text">
+        <div className="title-bar-text text-base">
+            {terminal.id}&nbsp;:&nbsp;
             {TerminalSectionId[terminal.id].toUpperCase()}
         </div>
         <div className="title-bar-controls">

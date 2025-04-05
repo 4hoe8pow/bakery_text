@@ -15,7 +15,7 @@ export const useWasteCommand = (
 
     return (cmd: WasteCommands) => {
         switch (cmd) {
-            case WasteCommands.DISPOSE:
+            case WasteCommands.RECYCLE:
                 wasteExec();
                 break;
             default:

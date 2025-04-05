@@ -22,6 +22,17 @@ body {
     color: var(--foreground);
 }
 
+@keyframes crt-flicker {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    38%,
+    62% {
+        opacity: 0.93;
+    }
+}
+
 @keyframes fade-in {
     from {
         opacity: 0;
@@ -61,5 +72,35 @@ body {
 
     .glitch {
         animation: glitch 0.1s infinite steps(2, end);
+    }
+
+    /* CRT風のグリッド線 */
+    .crt-grid {
+        background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 255, 255, 0.05),
+                rgba(255, 255, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 3px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.05),
+                rgba(255, 255, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+        background-size: 100% 4px, 4px 100%;
+    }
+
+    /* CRT風のぼかしと色収差 */
+    .crt-effect {
+        filter: contrast(1.6) brightness(0.81) saturate(1.5) blur(0.5px);
+        mix-blend-mode: screen;
+    }
+
+    /* CRT風のアニメーション */
+    .crt-flicker {
+        animation: crt-flicker 0.2s infinite;
     }
 }

@@ -26,10 +26,23 @@ export const usePantryCommand = (
         }
     }, [terminalContext, addOutput]);
 
+    const breadExec = useCallback(() => {
+        if (!terminalContext) {
+            addOutput(USAGE_ERROR_TERMINAL_CONTEXT, LogLevel.ERROR);
+            return;
+        }
+
+        const breadStatus = terminalContext.overviewBreadStatus();
+        addOutput({ ja: breadStatus }, LogLevel.INFO);
+    }, [terminalContext, addOutput]);
+
     return (cmd: PantryCommands) => {
         switch (cmd) {
             case PantryCommands.INGREDIENT:
                 ingredientExec();
+                break;
+            case PantryCommands.BREAD:
+                breadExec();
                 break;
             default:
                 addOutput(USAGE_UNKNOWN_PANTRY_COMMAND(cmd), LogLevel.ERROR);
