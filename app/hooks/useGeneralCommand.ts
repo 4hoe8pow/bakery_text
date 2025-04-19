@@ -9,6 +9,7 @@ import { TerminalContext } from "../context/TerminalContext";
 import { GeneralCommands } from "../utils/Command";
 import {
     USAGE_ACTIVATING_TERMINAL,
+    USAGE_DESCENT_INTO_ZANGE,
     USAGE_DISPOSE_FAILURE,
     USAGE_DISPOSE_SUCCESS,
     USAGE_EMPTY,
@@ -32,7 +33,6 @@ import {
     USAGE_INVALID_TERMINAL_ID,
     USAGE_INVALID_TERM_SUBCOMMAND,
     USAGE_LANGUAGE_CHANGED,
-    USAGE_LS_ITEM,
     USAGE_MISSING_ID_TERM_OPEN,
     USAGE_MODE_CHANGED,
     USAGE_REST_FAILURE,
@@ -113,14 +113,6 @@ export const useGeneralCommand = (
         }
     }, [addOutput, mode]);
 
-    const lsExec = useCallback(() => {
-        for (const [key, value] of Object.entries(TerminalSectionId)) {
-            if (Number.isNaN(Number(key))) {
-                addOutput(USAGE_LS_ITEM(value as string, key), LogLevel.INFO);
-            }
-        }
-    }, [addOutput]);
-
     const termExec = useCallback(
         (subCommand: string, id: string | undefined) => {
             switch (subCommand) {
@@ -195,6 +187,12 @@ export const useGeneralCommand = (
                 const modeId = Number(id);
                 if (Number.isNaN(modeId) || !(modeId in TerminalSectionId)) {
                     addOutput(USAGE_INVALID_MODE_ID(id), LogLevel.ERROR);
+                    return;
+                }
+                // まれに異常：懺悔モードへ転落
+                if (Math.random() < 0.005) {
+                    setMode(TerminalSectionId.Zange);
+                    addOutput(USAGE_DESCENT_INTO_ZANGE, LogLevel.ERROR);
                     return;
                 }
                 setMode(modeId); // モードを変更
@@ -292,9 +290,6 @@ export const useGeneralCommand = (
     return useCallback(
         (command: GeneralCommands, ...args: string[]) => {
             switch (command) {
-                case GeneralCommands.LS:
-                    lsExec();
-                    break;
                 case GeneralCommands.TERM:
                     termExec(args[0], args[1]);
                     break;
@@ -327,7 +322,6 @@ export const useGeneralCommand = (
             }
         },
         [
-            lsExec,
             termExec,
             modeExec,
             helpExec,

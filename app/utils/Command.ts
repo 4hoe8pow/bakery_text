@@ -1,5 +1,4 @@
 export enum GeneralCommands {
-    LS = "ls", // 各ｾｸｼｮﾝの一覧
     TERM = "term", // ﾀｰﾐﾅﾙの管理
     MODE = "mode", // モードの移動
     HELP = "help", // ヘルプ
@@ -52,4 +51,8 @@ export enum WasteCommands {
 
 export enum UtilitiesCommands {
     TEMP = "temp", // 室温の調整
+}
+
+export enum ZangeCommands {
+    Zange = "zange",
 }

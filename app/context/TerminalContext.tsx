@@ -342,10 +342,8 @@ export const TerminalProvider = ({
     }, []);
 
     const updateNigiwai = useCallback((value: number) => {
-        if (value <= 0 || value > 5.1) {
-            throw new Error(
-                "Nigiwai value must be greater than 0 and less than or equal to 5.1",
-            );
+        if (value === 0) {
+            throw new Error("Nigiwai value must not be 0");
         }
         setNigiwai(value);
     }, []);
@@ -684,7 +682,7 @@ export const TerminalProvider = ({
                     if (terminal.id !== id) return terminal;
 
                     const chance =
-                        nigiwai *
+                        Math.abs(nigiwai) *
                         (terminal.barometer.rodentCount +
                             terminal.barometer.trap) *
                         0.02;
@@ -718,7 +716,7 @@ export const TerminalProvider = ({
         setIngredientCost(DEFAULT_INGREDIENT_COST);
 
         const terminalIds = Object.values(TerminalSectionId).filter(
-            (id) => typeof id === "number",
+            (id) => typeof id === "number" && id !== TerminalSectionId.Zange,
         ) as TerminalSectionId[];
 
         for (const id of terminalIds) {

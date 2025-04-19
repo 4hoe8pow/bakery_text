@@ -20,6 +20,7 @@ export enum TerminalSectionId {
     SalesFront = 7,
     Waste = 8,
     Utilities = 9,
+    Zange = 999,
 }
 
 export enum BreadType {

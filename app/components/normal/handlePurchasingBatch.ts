@@ -15,7 +15,7 @@ export const handlePurchasingBatch = (context: TerminalContextType) => {
     ] as keyof Ingredient;
     const currentCost = ingredientCost[randomIngredient];
 
-    let newCost = currentCost * Math.log(nigiwai);
+    let newCost = currentCost * Math.log(Math.abs(nigiwai));
 
     // newCostが0.1を下回らないようにする
     if (newCost < 0.1) {

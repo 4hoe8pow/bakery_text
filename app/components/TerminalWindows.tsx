@@ -147,7 +147,7 @@ export const TerminalWindows = () => {
 
                 switch (terminal.status) {
                     case TerminalStatus.ON_BREAK:
-                        maintainEquipment(terminal.id, nigiwai);
+                        maintainEquipment(terminal.id, Math.abs(nigiwai));
                         addNews(terminal.id, USAGE_HEAL);
                         break;
                     case TerminalStatus.HEALTHY:

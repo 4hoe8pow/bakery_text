@@ -19,6 +19,7 @@ import { useSalesFrontCommand } from "../hooks/useSalesFrontCommand";
 import { useShapingCommand } from "../hooks/useShapingCommand";
 import { useUtilitiesCommand } from "../hooks/useUtilitiesCommand";
 import { useWasteCommand } from "../hooks/useWasteCommand";
+import { useZangeCommand } from "../hooks/useZangeCommand";
 import {
     BakingCommands,
     CoolingCommands,
@@ -31,6 +32,7 @@ import {
     ShapingCommands,
     UtilitiesCommands,
     WasteCommands,
+    ZangeCommands,
 } from "../utils/Command";
 import { greeting } from "../utils/greeting";
 import {
@@ -116,6 +118,7 @@ export const BackgroundConsole = () => {
     const packagingCommandExecutor = usePackagingCommand(addOutput);
     const salesFrontCommandExecutor = useSalesFrontCommand(addOutput);
     const wasteCommandExecutor = useWasteCommand(addOutput);
+    const zangeCommandExecutor = useZangeCommand(addOutput, setMode);
 
     // ｺﾏﾝﾄﾞを実行
     const handleExecuteCommand = (command: string) => {
@@ -146,7 +149,10 @@ export const BackgroundConsole = () => {
         const commandMap = [
             {
                 commands: GeneralCommands,
-                modes: [] as TerminalSectionId[], // 全モードで許容
+                modes: Object.values(TerminalSectionId).filter(
+                    (id): id is TerminalSectionId =>
+                        id !== TerminalSectionId.Zange,
+                ),
                 executor: generalCommandExecutor,
             },
             {
@@ -198,6 +204,11 @@ export const BackgroundConsole = () => {
                 commands: UtilitiesCommands,
                 modes: [TerminalSectionId.Utilities] as TerminalSectionId[],
                 executor: utilitiesCommandExecutor,
+            },
+            {
+                commands: ZangeCommands,
+                modes: [TerminalSectionId.Zange] as TerminalSectionId[],
+                executor: zangeCommandExecutor,
             },
         ] as const;
 

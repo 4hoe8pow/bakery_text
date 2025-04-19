@@ -23,17 +23,23 @@ const Rain = () => {
         const random = (min: number, max: number) =>
             min + Math.random() * (max - min);
 
-        const createRaindrop = () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            length: random(11, 55),
-            speed: random(5, 10),
-            angle: Math.PI / 2 + (Math.random() - 0.5) * 0.062,
-            opacity: random(0.2, 1),
-            lineWidth: random(0.5, 2),
-        });
+        const createRaindrop = () => {
+            const lineWidth = random(0.5, 2);
+            return {
+                x: Math.random() * width,
+                y: Math.random() * height,
+                length: random(11, 55),
+                speed: lineWidth * random(2.5, 5), // 太いほど速く
+                angle: Math.PI / 2 + (Math.random() - 0.5) * 0.062,
+                opacity: random(0.2, 1),
+                lineWidth,
+            };
+        };
 
-        const raindrops = Array.from({ length: nigiwai * 350 }, createRaindrop);
+        const raindrops = Array.from(
+            { length: Math.abs(nigiwai) * 350 },
+            createRaindrop,
+        );
         const ripples: {
             x: number;
             y: number;
@@ -42,6 +48,7 @@ const Rain = () => {
             alpha: number;
             decay: number;
             lineWidth: number;
+            aspectRatio: number; // 楕円の縦横比
         }[] = [];
 
         const isOminous = ominous !== null;
@@ -75,7 +82,8 @@ const Rain = () => {
                         maxRadius: drop.length,
                         alpha: drop.opacity,
                         decay: 0.02,
-                        lineWidth: random(0.5, 2),
+                        lineWidth: drop.lineWidth, // rippleの太さをdropに合わせる
+                        aspectRatio: random(1, 1.5), // 横長の縦横比
                     });
                     Object.assign(drop, createRaindrop());
                     drop.y = 0;
@@ -86,12 +94,16 @@ const Rain = () => {
                 const r = ripples[i];
                 ctx.beginPath();
                 ctx.globalAlpha = r.alpha;
-                ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                ctx.save();
+                ctx.translate(r.x, r.y);
+                ctx.scale(r.aspectRatio, 1); // 横長にスケール
+                ctx.arc(0, 0, r.radius, 0, Math.PI * 2);
+                ctx.restore();
                 ctx.strokeStyle = rippleColor;
                 ctx.lineWidth = r.lineWidth;
                 ctx.stroke();
-                r.radius += 1;
-                r.alpha -= r.decay;
+                r.radius += r.lineWidth * 0.5; // 太いほど速く広がる
+                r.alpha -= r.decay * (r.lineWidth / 2); // 太いほど早く消える
                 if (r.alpha <= 0 || r.radius > r.maxRadius)
                     ripples.splice(i, 1);
             }
@@ -113,7 +125,7 @@ const Rain = () => {
     }, [nigiwai, ominous]);
 
     return (
-        <div className="-z-50 pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="-z-50 pointer-events-none fixed inset-0 overflow-hidden bg-black">
             <canvas ref={canvasRef} className="size-full" />
         </div>
     );

@@ -1,76 +1,103 @@
-import { useContext, useEffect } from "react";
+"use client";
+
+import {
+    useContext,
+    useEffect,
+    Suspense,
+    useRef,
+    type Dispatch,
+    type SetStateAction,
+    type RefObject,
+} from "react";
+import { useSession } from "next-auth/react";
 import { TerminalContext, TerminalSectionId } from "../context/TerminalContext";
 
+interface CommandInputProps {
+    input: string;
+    inputRef: RefObject<HTMLInputElement | null>;
+    mode: TerminalSectionId;
+    setInput: Dispatch<SetStateAction<string>>;
+    handleKeyDown: (e: React.KeyboardEvent) => void;
+    isInputEnabled: boolean;
+}
+
 const formatCash = (amount: number): string => {
-    const units = ["", "K", "M", "B", "T", "Q", "Qi", "Sx", "Sp", "Oc", "No"];
-    let unitIndex = 0;
-    let formattedAmount = amount;
-
-    while (formattedAmount >= 1000 && unitIndex < units.length - 1) {
-        formattedAmount /= 1000;
-        unitIndex++;
+    const units = ["", "K", "M", "B", "T"];
+    let idx = 0;
+    let val = amount;
+    while (val >= 1000 && idx < units.length - 1) {
+        val /= 1000;
+        idx++;
     }
-
-    return `${formattedAmount.toFixed(3)}${units[unitIndex]}`;
+    return `${val.toFixed(3)}${units[idx]}`;
 };
 
-// プロンプト部分の表示コンポーネント
-const PromptDisplay = ({
-    cash,
-    mode,
-}: { cash: number; mode: TerminalSectionId }) => {
-    return (
-        <span className="text-white">
-            ~&gt;&nbsp;{formatCash(cash)}&nbsp;@&nbsp;
-            {TerminalSectionId[mode].toUpperCase()}
-            &nbsp;$&nbsp;
-        </span>
-    );
+const sendScore = async (username: string, cash: number) => {
+    const timestamp = new Date().toISOString();
+    try {
+        const res = await fetch("/api/ranking/submit", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-timestamp": timestamp,
+            },
+            body: JSON.stringify({ name: username, score: cash }),
+        });
+        if (!res.ok) {
+            const err = await res.json();
+            alert(`Failed to send score: ${err.error}`);
+        }
+    } catch (e) {
+        alert(`Error sending score: ${e instanceof Error ? e.message : e}`);
+    }
 };
 
-// ｺﾏﾝﾄﾞ入力を処理するコンポーネント
 export const CommandInput = ({
     input,
     mode,
     setInput,
     handleKeyDown,
-    inputRef,
     isInputEnabled,
-}: {
-    input: string;
-    mode: TerminalSectionId;
-    setInput: React.Dispatch<React.SetStateAction<string>>;
-    handleKeyDown: (e: React.KeyboardEvent) => void;
-    inputRef: React.RefObject<HTMLInputElement | null>;
-    isInputEnabled: boolean;
-}) => {
+}: CommandInputProps) => {
+    const session = useSession();
+    const username = session?.data?.user?.name ?? null;
     const context = useContext(TerminalContext);
     if (!context) {
         throw new Error("TerminalContext is not available");
     }
 
     const { cash, isGameOver } = context;
+    const inputRef = useRef<HTMLInputElement>(null);
 
-    // 入力フィールドにフォーカス
+    // ゲームオーバーでスコア送信
     useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
+        if (isGameOver && username) {
+            sendScore(username, cash);
+        }
+    }, [isGameOver, cash, username]);
+
+    // クリックで input にフォーカス
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
             e.preventDefault();
             inputRef.current?.focus();
         };
-
-        if (isInputEnabled) {
-            inputRef.current?.focus();
-        }
-
-        document.addEventListener("click", handleClick);
-        return () => {
-            document.removeEventListener("click", handleClick);
-        };
-    }, [inputRef, isInputEnabled]);
+        if (isInputEnabled) inputRef.current?.focus();
+        document.addEventListener("click", handler);
+        return () => document.removeEventListener("click", handler);
+    }, [isInputEnabled]);
 
     return (
         <div className="mt-1.5 flex w-full font-bold">
-            <PromptDisplay cash={cash} mode={mode} />
+            <Suspense fallback={<div>Loading prompt…</div>}>
+                {username && (
+                    <span className="text-white">
+                        ~{username}&nbsp;&gt;&nbsp;{formatCash(cash)}
+                        &nbsp;@&nbsp;
+                        {TerminalSectionId[mode].toUpperCase()}&nbsp;$&nbsp;
+                    </span>
+                )}
+            </Suspense>
             <input
                 ref={inputRef}
                 type="text"
@@ -79,8 +106,7 @@ export const CommandInput = ({
                 onKeyDown={handleKeyDown}
                 className="!shadow-none !bg-transparent flex-grow caret-green-500"
                 disabled={!isInputEnabled || isGameOver !== null}
-                title="Command Input"
-                placeholder="Type your command here"
+                placeholder="Type your command..."
             />
         </div>
     );

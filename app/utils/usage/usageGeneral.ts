@@ -248,3 +248,8 @@ export const USAGE_TRAP_SUCCESS = {
     ja: "罠が成功し、ねずみを1匹捕まえました！",
     en: "The trap succeeded, and 1 rodent was caught!",
 };
+
+export const USAGE_DESCENT_INTO_ZANGE: UsageCode = {
+    ja: "懺悔室に入りました。",
+    en: "Entered the confession chamber.",
+};

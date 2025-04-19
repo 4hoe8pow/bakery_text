@@ -21,14 +21,17 @@ export const handleSalesFrontBatch = async (context: TerminalContextType) => {
         context;
 
     const isSold =
-        Math.random() * 100 < Math.min(Math.max((nigiwai / 5.0) * 100, 0), 100);
+        Math.random() * 100 <
+        Math.min(Math.max((Math.abs(nigiwai) / 5.0) * 100, 0), 100);
     if (isSold) {
         const shelvedBread = bread.filter(
             (b) => b.cookStatus === BreadCookingStatus.Shelved,
         );
 
         const totalSales = shelvedBread.reduce(
-            (sum, b) => sum + Math.round((BREAD_PRICES[b.kind] ?? 0) * nigiwai),
+            (sum, b) =>
+                sum +
+                Math.round((BREAD_PRICES[b.kind] ?? 0) * Math.abs(nigiwai)),
             0,
         );
 
@@ -39,7 +42,9 @@ export const handleSalesFrontBatch = async (context: TerminalContextType) => {
                     TerminalSectionId.SalesFront,
                     USAGE_SALESFRONT_SOLD(
                         BreadType[b.kind],
-                        Math.round((BREAD_PRICES[b.kind] ?? 0) * nigiwai),
+                        Math.round(
+                            (BREAD_PRICES[b.kind] ?? 0) * Math.abs(nigiwai),
+                        ),
                     ),
                 );
             }
