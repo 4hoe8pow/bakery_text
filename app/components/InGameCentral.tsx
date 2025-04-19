@@ -121,7 +121,7 @@ export const InGameCentral = () => {
 
     const applyDamage = useCallback(
         (terminalId: TerminalSectionId) => {
-            const damage = Math.random() * nigiwai;
+            const damage = Math.random() * Math.abs(nigiwai);
             wearEquipment(terminalId, damage);
         },
         [wearEquipment, nigiwai],
@@ -130,7 +130,7 @@ export const InGameCentral = () => {
     const applyWaste = useCallback(
         (terminalId: TerminalSectionId) => {
             if (terminalId !== TerminalSectionId.Waste) {
-                const wasteAmount = Math.random() * nigiwai;
+                const wasteAmount = Math.random() * Math.abs(nigiwai);
                 accumulateWaste(terminalId, wasteAmount);
             }
         },
@@ -139,7 +139,7 @@ export const InGameCentral = () => {
 
     const applyRodents = useCallback(
         (terminalId: TerminalSectionId) => {
-            increaseRodents(terminalId, Math.floor(nigiwai));
+            increaseRodents(terminalId, Math.floor(Math.abs(nigiwai)));
         },
         [increaseRodents, nigiwai],
     );
@@ -159,7 +159,7 @@ export const InGameCentral = () => {
                 switch (terminal.status) {
                     // 休憩中
                     case TerminalStatus.ON_BREAK:
-                        maintainEquipment(terminal.id, nigiwai);
+                        maintainEquipment(terminal.id, Math.abs(nigiwai));
                         addNews(terminal.id, USAGE_HEAL);
                         break;
                     // 通常時

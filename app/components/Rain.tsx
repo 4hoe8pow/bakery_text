@@ -33,7 +33,10 @@ const Rain = () => {
             lineWidth: random(0.5, 2),
         });
 
-        const raindrops = Array.from({ length: nigiwai * 350 }, createRaindrop);
+        const raindrops = Array.from(
+            { length: Math.abs(nigiwai) * 350 },
+            createRaindrop,
+        );
         const ripples: {
             x: number;
             y: number;
