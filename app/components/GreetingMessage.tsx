@@ -14,7 +14,7 @@ function getGreeting() {
 
 export function GreetingMessage({ status, userName }: GreetingMessageProps) {
     return (
-        <span className="text-green-300 text-sm">
+        <span className="z-50 text-green-500 text-sm">
             {`${getGreeting()}, ${
                 status === "authenticated" ? (userName ?? "user") : "guest"
             }.`}

@@ -19,22 +19,26 @@ export function XAuthButton() {
     };
 
     return (
-        <div className="flex flex-col items-center space-y-2">
+        <div className="z-10 flex flex-col items-center space-y-2">
             <GreetingMessage
                 status={status}
                 userName={session?.user?.name ?? undefined}
             />
-            <button
-                type="button"
-                onClick={handleClick}
-                className={`rounded px-6 py-2 transition ${
-                    status === "authenticated"
-                        ? "bg-green-500 text-white hover:bg-green-600"
-                        : "bg-blue-500 text-white hover:bg-blue-600"
-                }`}
-            >
-                {status === "authenticated" ? "OPEN UP" : "Sign in with X"}
-            </button>
+            <div className="flex items-center space-x-2">
+                <span className="text-gray-500 text-sm">Here! →</span>
+                <button
+                    type="button"
+                    onClick={handleClick}
+                    className={`rounded px-6 py-2 transition ${
+                        status === "authenticated"
+                            ? "bg-green-500 text-white hover:bg-green-600"
+                            : "bg-blue-500 text-white hover:bg-blue-600"
+                    }`}
+                >
+                    {status === "authenticated" ? "OPEN UP" : "Sign in with X"}
+                </button>
+                <span className="text-gray-500 text-sm">← Here!</span>
+            </div>
         </div>
     );
 }

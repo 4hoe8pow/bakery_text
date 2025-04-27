@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function Sparkles() {
     const [sparkles, setSparkles] = useState<
@@ -21,8 +21,13 @@ export function Sparkles() {
             {sparkles.map((sparkle) => (
                 <div
                     key={sparkle.id}
-                    className="sparkle"
-                    style={{ top: sparkle.top, left: sparkle.left }}
+                    className="pointer-events-none absolute h-1.5 w-1.5 animate-sparkle rounded-full bg-transparent"
+                    style={{
+                        top: sparkle.top,
+                        left: sparkle.left,
+                        background:
+                            "radial-gradient(circle, white, transparent)",
+                    }}
                 />
             ))}
         </>

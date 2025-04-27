@@ -3,7 +3,11 @@
 import { TerminalContext } from "@/app/context/TerminalContext";
 import { useContext, useEffect, useRef } from "react";
 
-const Rain = () => {
+type RainProps = {
+    whetherCoefficient: number;
+};
+
+const Rain = ({ whetherCoefficient }: RainProps) => {
     const context = useContext(TerminalContext);
     if (!context) return null;
 
@@ -37,7 +41,7 @@ const Rain = () => {
         };
 
         const raindrops = Array.from(
-            { length: Math.abs(nigiwai) * 350 },
+            { length: Math.abs(nigiwai) ** whetherCoefficient },
             createRaindrop,
         );
         const ripples: {
@@ -122,7 +126,7 @@ const Rain = () => {
         };
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, [nigiwai, ominous]);
+    }, [nigiwai, ominous, whetherCoefficient]);
 
     return (
         <div className="-z-50 pointer-events-none fixed inset-0 overflow-hidden bg-black">

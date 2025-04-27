@@ -17,7 +17,7 @@ import {
     type TransactionType,
     type UsageCode,
 } from "../bt.types";
-import { DEFAULT_INGREDIENT_COST } from "../utils/breadRecipe";
+import { DEFAULT_INGREDIENT_COST, DEFAULT_NIGIWAI } from "../utils/breadRecipe";
 import { mapAndUpdate } from "../utils/news";
 import { USAGE_TRAP_SUCCESS } from "../utils/usage/usageGeneral";
 
@@ -123,7 +123,7 @@ export const TerminalProvider = ({
     );
     const [language, setLanguage] = useState<"ja" | "en">("ja");
     const [bread, setBread] = useState<Bread[]>([]); // 作業途中のパンの状態
-    const [nigiwai, setNigiwai] = useState<number>(1.0);
+    const [nigiwai, setNigiwai] = useState<number>(DEFAULT_NIGIWAI);
     const [productionSpeed, setProductionSpeed] = useState<number>(
         DEFAULT_PRODUCTION_SPEED,
     );

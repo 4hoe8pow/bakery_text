@@ -176,16 +176,6 @@
         animation: marquee-bounce 11s linear infinite;
     }
 
-    .sparkle {
-        position: absolute;
-        width: 6px;
-        height: 6px;
-        background: radial-gradient(circle, white, transparent);
-        border-radius: 50%;
-        animation: sparkle 1.5s infinite ease-in-out;
-        pointer-events: none;
-    }
-
     .train-scroll {
         position: absolute;
         display: inline-block;
