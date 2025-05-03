@@ -692,7 +692,10 @@ export const TerminalProvider = ({
                         Math.random() < chance
                     ) {
                         const currentRodents = terminal.barometer.rodentCount;
-                        const rodentsCaught = Math.round(currentRodents / 2); // 半減（四捨五入）
+                        const rodentsCaught =
+                            currentRodents === 1
+                                ? 1 // 残り1匹なら確実に0にする
+                                : Math.round(currentRodents / 2); // 半減（四捨五入）
                         updateTrap(terminal.id, -1); // 罠を減らす
                         decreaseRodents(terminal.id, rodentsCaught); // ネズミを減らす
                         addNews(terminal.id, {
